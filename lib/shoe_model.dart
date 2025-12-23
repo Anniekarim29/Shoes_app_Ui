@@ -5,7 +5,8 @@ class Shoe {
   final String description;
   final String price;
   final String imagePath;
-  final Color backgroundColor;
+  final Color primaryColor;
+  final Color secondaryColor;
   final Color accentColor;
 
   Shoe({
@@ -13,7 +14,8 @@ class Shoe {
     required this.description,
     required this.price,
     required this.imagePath,
-    required this.backgroundColor,
+    required this.primaryColor,
+    required this.secondaryColor,
     required this.accentColor,
   });
 }
@@ -24,7 +26,8 @@ final List<Shoe> shoes = [
     description: 'The Nike Air Max 270 delivers visible cushioning under every step.',
     price: '\$150.00',
     imagePath: 'assets/shoes1.png',
-    backgroundColor: const Color(0xFF0A1F1A), // Dark Green
+    primaryColor: const Color(0xFF00120E), // Ultra Dark Teal
+    secondaryColor: const Color(0xFF004D40), // Rich Forest Green
     accentColor: const Color(0xFFCCFF00), // Volt
   ),
   Shoe(
@@ -32,7 +35,8 @@ final List<Shoe> shoes = [
     description: 'Experience the next level of comfort with React foam technology.',
     price: '\$130.00',
     imagePath: 'assets/shoes2.png',
-    backgroundColor: const Color(0xFF140C21), // Dark Purple
+    primaryColor: const Color(0xFF0A040F), // Ultra Dark Purple
+    secondaryColor: const Color(0xFF311B92), // Deep Royale
     accentColor: const Color(0xFFFFD700), // Gold
   ),
   Shoe(
@@ -40,31 +44,35 @@ final List<Shoe> shoes = [
     description: 'Built for speed and comfort during your long runs.',
     price: '\$160.00',
     imagePath: 'assets/shoes3.png',
-    backgroundColor: const Color(0xFF081426), // Dark Blue
-    accentColor: const Color(0xFFFF4500), // Orange Red
+    primaryColor: const Color(0xFF040A1A), // Ultra Dark Blue
+    secondaryColor: const Color(0xFF01579B), // Electric Navy
+    accentColor: const Color(0xFFFF4500), // Lava
   ),
   Shoe(
     name: 'NIKE AIR FORCE 1',
     description: 'The legend lives on in the Nike Air Force 1.',
     price: '\$100.00',
     imagePath: 'assets/shoes4.png',
-    backgroundColor: const Color(0xFF1B1B1B), // Dark Gray
-    accentColor: const Color(0xFF00FFFF), // Cyan
+    primaryColor: const Color(0xFF121212), // Jet Black
+    secondaryColor: const Color(0xFF424242), // Steel Gray
+    accentColor: const Color(0xFF00FFFF), // Cyber Cyan
   ),
   Shoe(
     name: 'NIKE JOYRIDE RUN',
     description: 'Tiny foam beads underfoot provide personalized cushioning.',
     price: '\$180.00',
     imagePath: 'assets/shoes5.png',
-    backgroundColor: const Color(0xFF1B0A0A), // Dark Maroon
-    accentColor: const Color(0xFFFF69B4), // Hot Pink
+    primaryColor: const Color(0xFF1A0505), // Ultra Dark Maroon
+    secondaryColor: const Color(0xFFB71C1C), // Blood Red
+    accentColor: const Color(0xFFFF69B4), // Neon Pink
   ),
   Shoe(
     name: 'NIKE PEGASUS 37',
     description: 'The trusted favorite returns with updated cushioning.',
     price: '\$120.00',
     imagePath: 'assets/shoes6.png',
-    backgroundColor: const Color(0xFF0F121C), // Midnight
-    accentColor: const Color(0xFF7FFF00), // Chartreuse
+    primaryColor: const Color(0xFF05081A), // Ultra Dark Navy
+    secondaryColor: const Color(0xFF1A237E), // Deep Space Blue
+    accentColor: const Color(0xFF7FFF00), // Lime Glow
   ),
 ];

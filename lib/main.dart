@@ -44,11 +44,7 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
   late PageController _pageController;
   double _currentPage = 0.0;
   late AnimationController _floatingController;
-  
-  // LIVE CART STATE
   int _cartCount = 3;
-  late AnimationController _cartAnimationController;
-  late Animation<double> _cartScaleAnimation;
 
   @override
   void initState() {
@@ -64,66 +60,40 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
       vsync: this,
       duration: const Duration(seconds: 5),
     )..repeat();
-
-    // Cart Animation
-    _cartAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _cartScaleAnimation = Tween<double>(begin: 1.0, end: 1.4).animate(
-      CurvedAnimation(parent: _cartAnimationController, curve: Curves.elasticOut),
-    );
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     _floatingController.dispose();
-    _cartAnimationController.dispose();
     super.dispose();
-  }
-
-  void _addToCart() {
-    setState(() {
-      _cartCount++;
-    });
-    _cartAnimationController.forward().then((_) => _cartAnimationController.reverse());
-    
-    // Show a quick snackbar/feedback
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Added ${shoes[_currentPage.round()].name} to cart!', style: const TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: shoes[_currentPage.round()].accentColor.withValues(alpha: 0.9),
-        duration: const Duration(seconds: 1),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     int activeIndex = _currentPage.round().clamp(0, shoes.length - 1);
     final size = MediaQuery.of(context).size;
+    final currentShoe = shoes[activeIndex];
     
     return Scaffold(
       body: AnimatedContainer(
-        duration: const Duration(milliseconds: 800),
+        duration: const Duration(milliseconds: 1000),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+          // PURE PREMIUM RADIAL GRADIENT
+          gradient: RadialGradient(
+            center: const Alignment(0.4, -0.3),
+            radius: 1.5,
             colors: [
-              shoes[activeIndex].backgroundColor,
-              shoes[activeIndex].backgroundColor.withValues(alpha: 0.6),
+              currentShoe.secondaryColor.withValues(alpha: 0.4),
+              currentShoe.primaryColor,
               Colors.black,
             ],
+            stops: const [0.0, 0.4, 1.0],
           ),
         ),
         child: Stack(
           children: [
-            // Watermark (Nike Air) - Parallax
+            // Watermark (Nike Air)
             Positioned(
               top: size.height * 0.1,
               left: -120 - (_currentPage * 90),
@@ -153,54 +123,34 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 28),
-                        
-                        // LIVE CART INDICATOR
-                        ScaleTransition(
-                          scale: _cartScaleAnimation,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(25),
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.shopping_bag_outlined, size: 18),
-                                const SizedBox(width: 8),
-                                const Text('Cart', style: TextStyle(fontWeight: FontWeight.bold)),
-                                const SizedBox(width: 8),
-                                AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 300),
-                                  transitionBuilder: (Widget child, Animation<double> animation) {
-                                    return ScaleTransition(scale: animation, child: child);
-                                  },
-                                  child: Container(
-                                    key: ValueKey<int>(_cartCount),
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                      color: shoes[activeIndex].accentColor,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Text(
-                                      '$_cartCount',
-                                      style: const TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                        const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+                        // Cart Indicator
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            children: [
+                              const Text('Cart', style: TextStyle(fontWeight: FontWeight.bold)),
+                              const SizedBox(width: 8),
+                              CircleAvatar(
+                                radius: 10,
+                                backgroundColor: currentShoe.accentColor,
+                                child: Text('$_cartCount', 
+                                  style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold)),
+                              ),
+                            ],
                           ),
                         ),
-                        
-                        const Icon(Icons.menu_open, color: Colors.white, size: 28),
+                        const Icon(Icons.menu, color: Colors.white),
                       ],
                     ),
                   ),
                 ),
 
-                // Main Area (Shoes)
+                // Main Slider Area
                 Expanded(
                   child: PageView.builder(
                     controller: _pageController,
@@ -234,27 +184,29 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
                                 child: Stack(
                                   alignment: Alignment.center,
                                   children: [
-                                    // Reactive Shadow
+                                    // MULTI-LAYERED MIXED SHADOW
                                     Transform.translate(
-                                      offset: const Offset(0, 80),
+                                      offset: const Offset(0, 40),
                                       child: Container(
-                                        height: 35,
-                                        width: 210 * (1 - (floatY.abs() / 140)),
+                                        height: 300,
+                                        width: 300,
                                         decoration: BoxDecoration(
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.35),
-                                              blurRadius: 60 + floatY.abs(),
-                                              spreadRadius: 3,
-                                            ),
-                                          ],
+                                          shape: BoxShape.circle,
+                                          gradient: RadialGradient(
+                                            colors: [
+                                              shoes[index].secondaryColor.withValues(alpha: 0.35),
+                                              shoes[index].primaryColor.withValues(alpha: 0.1),
+                                              Colors.transparent,
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
+                                    // Actual Shoe
                                     Image.asset(
                                       shoes[index].imagePath,
                                       fit: BoxFit.contain,
-                                      width: size.width * 0.92,
+                                      width: size.width * 0.9,
                                     ),
                                   ],
                                 ),
@@ -274,10 +226,10 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
                     return AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       margin: const EdgeInsets.symmetric(horizontal: 5),
-                      height: 5,
-                      width: i == activeIndex ? 28 : 10,
+                      height: 4,
+                      width: i == activeIndex ? 25 : 8,
                       decoration: BoxDecoration(
-                        color: i == activeIndex ? shoes[activeIndex].accentColor : Colors.white12,
+                        color: i == activeIndex ? currentShoe.accentColor : Colors.white12,
                         borderRadius: BorderRadius.circular(10),
                       ),
                     );
@@ -292,59 +244,84 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
                   child: Column(
                     children: [
                       Text(
-                        shoes[activeIndex].name,
+                        currentShoe.name,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          fontSize: 30,
+                          fontSize: 28,
                           fontWeight: FontWeight.w900,
-                          letterSpacing: 1.5,
+                          letterSpacing: 2,
                         ),
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        shoes[activeIndex].description,
+                        currentShoe.description,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.white.withValues(alpha: 0.5),
+                          color: Colors.white.withValues(alpha: 0.4),
                           height: 1.5,
                         ),
                       ),
-                      const SizedBox(height: 45),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('Share', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1)),
-                          
-                          // LIVR ADD TO CART BUTTON
-                          GestureDetector(
-                            onTap: _addToCart,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              height: 80,
-                              width: 80,
-                              decoration: BoxDecoration(
-                                color: shoes[activeIndex].backgroundColor.withValues(alpha: 0.5),
-                                borderRadius: BorderRadius.circular(30),
-                                border: Border.all(color: shoes[activeIndex].accentColor.withValues(alpha: 0.3), width: 2),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: shoes[activeIndex].accentColor.withValues(alpha: 0.3),
-                                    blurRadius: 30,
-                                    spreadRadius: 2,
-                                    offset: const Offset(0, 10),
-                                  ),
-                                ],
+                      const SizedBox(height: 40),
+                      
+                      // PREMIUM ADD TO CART RE-DESIGN
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _cartCount++;
+                          });
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 75,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                currentShoe.secondaryColor.withValues(alpha: 0.8),
+                                currentShoe.primaryColor,
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: currentShoe.secondaryColor.withValues(alpha: 0.3),
+                                blurRadius: 25,
+                                offset: const Offset(0, 10),
                               ),
-                              child: Icon(Icons.add_shopping_cart_rounded, size: 34, color: shoes[activeIndex].accentColor),
+                            ],
+                          ),
+                          child: Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  'ADD TO CART',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 2,
+                                  ),
+                                ),
+                                const SizedBox(width: 20),
+                                Container(
+                                  height: 1,
+                                  width: 40,
+                                  color: Colors.white54,
+                                ),
+                                const SizedBox(width: 20),
+                                Text(
+                                  currentShoe.price,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          
-                          Text(
-                            shoes[activeIndex].price,
-                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white),
-                          ),
-                        ],
+                        ),
                       ),
                     ],
                   ),
