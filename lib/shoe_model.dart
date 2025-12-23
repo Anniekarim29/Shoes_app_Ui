@@ -24,7 +24,7 @@ final List<Shoe> shoes = [
     description: 'The Nike Air Max 270 delivers visible cushioning under every step.',
     price: '\$150.00',
     imagePath: 'assets/shoes1.png',
-    backgroundColor: const Color(0xFF1B4D3E), // Deep Green
+    backgroundColor: const Color(0xFF0A1F1A), // Dark Green
     accentColor: const Color(0xFFCCFF00), // Volt
   ),
   Shoe(
@@ -32,7 +32,7 @@ final List<Shoe> shoes = [
     description: 'Experience the next level of comfort with React foam technology.',
     price: '\$130.00',
     imagePath: 'assets/shoes2.png',
-    backgroundColor: const Color(0xFF4B0082), // Indigo
+    backgroundColor: const Color(0xFF140C21), // Dark Purple
     accentColor: const Color(0xFFFFD700), // Gold
   ),
   Shoe(
@@ -40,7 +40,7 @@ final List<Shoe> shoes = [
     description: 'Built for speed and comfort during your long runs.',
     price: '\$160.00',
     imagePath: 'assets/shoes3.png',
-    backgroundColor: const Color(0xFF0047AB), // Cobalt Blue
+    backgroundColor: const Color(0xFF081426), // Dark Blue
     accentColor: const Color(0xFFFF4500), // Orange Red
   ),
   Shoe(
@@ -48,7 +48,7 @@ final List<Shoe> shoes = [
     description: 'The legend lives on in the Nike Air Force 1.',
     price: '\$100.00',
     imagePath: 'assets/shoes4.png',
-    backgroundColor: const Color(0xFF2F4F4F), // Dark Slate Gray
+    backgroundColor: const Color(0xFF1B1B1B), // Dark Gray
     accentColor: const Color(0xFF00FFFF), // Cyan
   ),
   Shoe(
@@ -56,7 +56,7 @@ final List<Shoe> shoes = [
     description: 'Tiny foam beads underfoot provide personalized cushioning.',
     price: '\$180.00',
     imagePath: 'assets/shoes5.png',
-    backgroundColor: const Color(0xFF800000), // Maroon
+    backgroundColor: const Color(0xFF1B0A0A), // Dark Maroon
     accentColor: const Color(0xFFFF69B4), // Hot Pink
   ),
   Shoe(
@@ -64,7 +64,7 @@ final List<Shoe> shoes = [
     description: 'The trusted favorite returns with updated cushioning.',
     price: '\$120.00',
     imagePath: 'assets/shoes6.png',
-    backgroundColor: const Color(0xFF191970), // Midnight Blue
+    backgroundColor: const Color(0xFF0F121C), // Midnight
     accentColor: const Color(0xFF7FFF00), // Chartreuse
   ),
 ];

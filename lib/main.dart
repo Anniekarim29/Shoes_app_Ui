@@ -7,7 +7,6 @@ void main() {
   runApp(const ShoeShopApp());
 }
 
-// Enable Mouse Dragging for PageView on Web
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
@@ -45,6 +44,11 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
   late PageController _pageController;
   double _currentPage = 0.0;
   late AnimationController _floatingController;
+  
+  // LIVE CART STATE
+  int _cartCount = 3;
+  late AnimationController _cartAnimationController;
+  late Animation<double> _cartScaleAnimation;
 
   @override
   void initState() {
@@ -56,18 +60,46 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
       });
     });
 
-    // Slower, smoother cycle for a premium float
     _floatingController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
     )..repeat();
+
+    // Cart Animation
+    _cartAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _cartScaleAnimation = Tween<double>(begin: 1.0, end: 1.4).animate(
+      CurvedAnimation(parent: _cartAnimationController, curve: Curves.elasticOut),
+    );
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     _floatingController.dispose();
+    _cartAnimationController.dispose();
     super.dispose();
+  }
+
+  void _addToCart() {
+    setState(() {
+      _cartCount++;
+    });
+    _cartAnimationController.forward().then((_) => _cartAnimationController.reverse());
+    
+    // Show a quick snackbar/feedback
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Added ${shoes[_currentPage.round()].name} to cart!', style: const TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: shoes[_currentPage.round()].accentColor.withValues(alpha: 0.9),
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 
   @override
@@ -77,7 +109,7 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
     
     return Scaffold(
       body: AnimatedContainer(
-        duration: const Duration(milliseconds: 600),
+        duration: const Duration(milliseconds: 800),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -91,18 +123,18 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
         ),
         child: Stack(
           children: [
-            // Watermark Text (Parallax)
+            // Watermark (Nike Air) - Parallax
             Positioned(
               top: size.height * 0.1,
-              left: -100 - (_currentPage * 100),
+              left: -120 - (_currentPage * 90),
               child: Opacity(
-                opacity: 0.1,
+                opacity: 0.06,
                 child: RotatedBox(
                   quarterTurns: 3,
                   child: Text(
                     'NIKE AIR',
                     style: TextStyle(
-                      fontSize: 220,
+                      fontSize: 230,
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
                       letterSpacing: 10,
@@ -122,24 +154,46 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 28),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: [
-                              const Text('Cart', style: TextStyle(fontWeight: FontWeight.bold)),
-                              const SizedBox(width: 8),
-                              CircleAvatar(
-                                radius: 10,
-                                backgroundColor: shoes[activeIndex].accentColor,
-                                child: Text('3', style: TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.bold)),
-                              ),
-                            ],
+                        
+                        // LIVE CART INDICATOR
+                        ScaleTransition(
+                          scale: _cartScaleAnimation,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(25),
+                              border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.shopping_bag_outlined, size: 18),
+                                const SizedBox(width: 8),
+                                const Text('Cart', style: TextStyle(fontWeight: FontWeight.bold)),
+                                const SizedBox(width: 8),
+                                AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 300),
+                                  transitionBuilder: (Widget child, Animation<double> animation) {
+                                    return ScaleTransition(scale: animation, child: child);
+                                  },
+                                  child: Container(
+                                    key: ValueKey<int>(_cartCount),
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: shoes[activeIndex].accentColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Text(
+                                      '$_cartCount',
+                                      style: const TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
+                        
                         const Icon(Icons.menu_open, color: Colors.white, size: 28),
                       ],
                     ),
@@ -156,55 +210,51 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
                       double diff = index - _currentPage;
                       double absDiff = diff.abs();
                       
-                      // Elastic Scale & Dynamic Rotation
                       double scale = (1 - (absDiff * 0.18)).clamp(0.0, 1.2);
-                      double opacity = (1 - (absDiff * 0.7)).clamp(0.0, 1.0);
-                      double slideRotation = diff * 0.5;
+                      double opacity = (1 - (absDiff * 0.8)).clamp(0.0, 1.0);
+                      double rotation = diff * 0.5;
 
                       return Opacity(
                         opacity: opacity,
                         child: AnimatedBuilder(
                           animation: _floatingController,
                           builder: (context, child) {
-                            // UNIQUE MULTI-AXIS FLOAT
-                            // Combines vertical sine and horizontal cosine for a circular/orbital float
                             double floatY = 25 * math.sin(_floatingController.value * 2 * math.pi);
-                            double floatX = 10 * math.cos(_floatingController.value * 2 * math.pi);
-                            double floatRotate = 0.05 * math.sin(_floatingController.value * 2 * math.pi);
+                            double floatX = 12 * math.cos(_floatingController.value * 2 * math.pi);
+                            double floatRotate = 0.04 * math.sin(_floatingController.value * 2 * math.pi);
 
                             return Transform(
                               transform: Matrix4.identity()
                                 ..setEntry(3, 2, 0.001)
-                                ..translate(floatX, floatY, 0) // Multi-axis translation
+                                ..translate(floatX, floatY, 0)
                                 ..scale(scale)
-                                ..rotateZ(slideRotation + floatRotate), // Slide + Float rotation
+                                ..rotateZ(rotation + floatRotate),
                               alignment: Alignment.center,
                               child: Center(
                                 child: Stack(
                                   alignment: Alignment.center,
                                   children: [
-                                    // Dynamic Shadow that reacts to FLOAT
+                                    // Reactive Shadow
                                     Transform.translate(
                                       offset: const Offset(0, 80),
                                       child: Container(
-                                        height: 30,
-                                        width: 200 * (1 - (floatY.abs() / 150)),
+                                        height: 35,
+                                        width: 210 * (1 - (floatY.abs() / 140)),
                                         decoration: BoxDecoration(
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.3),
-                                              blurRadius: 50 + floatY.abs(),
-                                              spreadRadius: 2,
+                                              color: Colors.black.withValues(alpha: 0.35),
+                                              blurRadius: 60 + floatY.abs(),
+                                              spreadRadius: 3,
                                             ),
                                           ],
                                         ),
                                       ),
                                     ),
-                                    // The Shoe
                                     Image.asset(
                                       shoes[index].imagePath,
                                       fit: BoxFit.contain,
-                                      width: size.width * 0.9,
+                                      width: size.width * 0.92,
                                     ),
                                   ],
                                 ),
@@ -217,7 +267,7 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
                   ),
                 ),
 
-                // Dots indicator
+                // Dots
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(shoes.length, (i) {
@@ -225,20 +275,20 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
                       duration: const Duration(milliseconds: 300),
                       margin: const EdgeInsets.symmetric(horizontal: 5),
                       height: 5,
-                      width: i == activeIndex ? 25 : 10,
+                      width: i == activeIndex ? 28 : 10,
                       decoration: BoxDecoration(
-                        color: i == activeIndex ? shoes[activeIndex].accentColor : Colors.white24,
+                        color: i == activeIndex ? shoes[activeIndex].accentColor : Colors.white12,
                         borderRadius: BorderRadius.circular(10),
                       ),
                     );
                   }),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 25),
 
-                // Bottom Content
+                // Details Content
                 Container(
-                  padding: const EdgeInsets.fromLTRB(40, 20, 40, 40),
+                  padding: const EdgeInsets.fromLTRB(40, 0, 40, 40),
                   child: Column(
                     children: [
                       Text(
@@ -247,6 +297,7 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
                         style: const TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.w900,
+                          letterSpacing: 1.5,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -255,35 +306,43 @@ class _ShoeShowcaseScreenState extends State<ShoeShowcaseScreen> with TickerProv
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.white.withValues(alpha: 0.6),
+                          color: Colors.white.withValues(alpha: 0.5),
                           height: 1.5,
                         ),
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 45),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Share', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                          Container(
-                            height: 75,
-                            width: 75,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(25),
-                              border: Border.all(color: Colors.white12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: shoes[activeIndex].accentColor.withValues(alpha: 0.25),
-                                  blurRadius: 25,
-                                  offset: const Offset(0, 10),
-                                ),
-                              ],
+                          const Text('Share', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1)),
+                          
+                          // LIVR ADD TO CART BUTTON
+                          GestureDetector(
+                            onTap: _addToCart,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              height: 80,
+                              width: 80,
+                              decoration: BoxDecoration(
+                                color: shoes[activeIndex].backgroundColor.withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(color: shoes[activeIndex].accentColor.withValues(alpha: 0.3), width: 2),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: shoes[activeIndex].accentColor.withValues(alpha: 0.3),
+                                    blurRadius: 30,
+                                    spreadRadius: 2,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(Icons.add_shopping_cart_rounded, size: 34, color: shoes[activeIndex].accentColor),
                             ),
-                            child: const Icon(Icons.add_shopping_cart, size: 32, color: Colors.white),
                           ),
+                          
                           Text(
                             shoes[activeIndex].price,
-                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white),
                           ),
                         ],
                       ),
