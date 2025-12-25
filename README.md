@@ -1,12 +1,12 @@
-# 👟 Premium Shoe Showcase App
+#  Premium Shoe Showcase App
 
 > **Elevate your E-commerce Experience.** What if your products didn't just sit in a grid, but actually *lived* on the screen?
 
 This high-end Flutter application redefines product storytelling. Designed for premium brands, it combines **dynamic physics**, **orbital animations**, and **liquid swiping** to create an immersive shopping experience that captivates users at first glance.
 
----
 
-## ✨ Visual Showcase
+
+##  Visual Showcase
 
 <div align="center">
   <img src="assets/readme/iPhone-13-PRO-localhost.png" width="30%" />
@@ -21,19 +21,19 @@ This high-end Flutter application redefines product storytelling. Designed for p
 
 ---
 
-## 💎 Why this Showcase?
+##  Why this Showcase?
 
 Traditional e-commerce is flat. This app brings **depth** and **emotion** to digital retail through:
 
-*   🚀 **Orbital Floating Animations**: Products move in a natural, multi-axis orbital path, giving them a physical, high-end feel.
-*   🌊 **Liquid Swipe Interaction**: Navigating between products feels fluid and elastic, mimicking the flow of water.
-*   🌑 **Premium Dark Aesthetic**: A curated "Jet Black" theme with vibrant, shoe-specific glowing shadows and radial gradients.
-*   ✨ **Glassmorphism UI**: Modern "Add to Cart" interactions using background blur and subtle lighting effects.
+*    **Orbital Floating Animations**: Products move in a natural, multi-axis orbital path, giving them a physical, high-end feel.
+*    **Liquid Swipe Interaction**: Navigating between products feels fluid and elastic, mimicking the flow of water.
+*    **Premium Dark Aesthetic**: A curated "Jet Black" theme with vibrant, shoe-specific glowing shadows and radial gradients.
+*    **Glassmorphism UI**: Modern "Add to Cart" interactions using background blur and subtle lighting effects.
 *   📡 **Live Feedback**: Real-time cart updates with elastic scale animations for immediate user satisfaction.
 
 ---
 
-## 🛠️ Built With
+##  Built With
 
 *   **Flutter SDK**: For cross-platform high-performance visuals.
 *   **Custom Animation Controllers**: Powering the orbital physics and liquid transitions.
@@ -41,7 +41,7 @@ Traditional e-commerce is flat. This app brings **depth** and **emotion** to dig
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 1.  **Clone the Repo**: `git clone https://github.com/Anniekarim29/Shoes_app_Ui.git`
 2.  **Install Dependencies**: `flutter pub get`
